@@ -1,0 +1,545 @@
+apiVersion: kubeless.io/v1beta1
+kind: Function
+metadata:
+  labels:
+    created-by: kubeless
+    function: create
+  name: create
+  namespace: default
+spec:
+  checksum: sha256:53ecebd5e761d2564b7b57fed84bc5a02397c44618db53ac5bb28e41f32d5d6a
+  deployment:
+    metadata:
+      creationTimestamp: null
+    spec:
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - env:
+            - name: REDIS_HOST
+              value: gangly-boxer-redis-master
+            - name: REDIS_PASSWORD
+              value: HZ7QDjLDH7
+            name: ""
+            resources: {}
+    status: {}
+  deps: |
+    {
+      "name": "todos",
+      "version": "0.1.0",
+      "description": "Todo service built with Serverless",
+      "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+      },
+      "author": "",
+      "license": "MIT",
+      "dependencies": {
+        "redis": "^2.8.0",
+        "uuid": "^2.0.3"
+      },
+      "devDependencies": {
+        "serverless-kubeless": "^0.4.0"
+      }
+    }
+  function: |
+    'use strict';
+
+    const uuid = require('uuid');
+    const redis = require('redis');
+
+    const host = process.env.REDIS_HOST;
+    const pass = process.env.REDIS_PASSWORD;
+
+    module.exports = {
+      create: (event, context) => new Promise((resolve, reject) => {
+        const client = redis.createClient({
+          host,
+          password: pass,
+        });
+        const data = event.data;
+        data.id = uuid.v1();
+        data.updatedAt = new Date().getTime();
+        client.on('error', function (err) {
+          reject('Error ' + err);
+        });
+        client.on('ready', () => {
+          client.hset('todos', data.id, JSON.stringify(data), (err, reply) => {
+            client.quit();
+            if (err !== null) {
+              reject(err);
+            } else {
+              resolve(JSON.stringify(data));
+            }
+          })
+        })
+      }),
+    };
+  function-content-type: text
+  handler: todos.create
+  horizontalPodAutoscaler:
+    metadata:
+      creationTimestamp: null
+    spec:
+      maxReplicas: 0
+      scaleTargetRef:
+        kind: ""
+        name: ""
+    status:
+      conditions: null
+      currentMetrics: null
+      currentReplicas: 0
+      desiredReplicas: 0
+  runtime: nodejs8
+  service:
+    ports:
+    - name: http-function-port
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      created-by: kubeless
+      function: create
+    type: ClusterIP
+  timeout: "180"
+---
+apiVersion: kubeless.io/v1beta1
+kind: Function
+metadata:
+  clusterName: ""
+  creationTimestamp: 2018-04-24T16:32:21Z
+  finalizers:
+  - kubeless.io/function
+  generation: 0
+  labels:
+    created-by: kubeless
+    function: delete
+  name: delete
+  namespace: default
+  resourceVersion: "4832"
+  selfLink: /apis/kubeless.io/v1beta1/namespaces/default/functions/delete
+  uid: 0fb13719-47dd-11e8-9f92-080027c46d95
+spec:
+  checksum: sha256:ee375ba7c08c5b04753ab5cd21c45f666e424c588d1526a876052104c62c178f
+  deployment:
+    metadata:
+      creationTimestamp: null
+    spec:
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - env:
+            - name: REDIS_HOST
+              value: gangly-boxer-redis-master
+            - name: REDIS_PASSWORD
+              value: HZ7QDjLDH7
+            name: ""
+            resources: {}
+    status: {}
+  deps: |
+    {
+      "name": "todos",
+      "version": "0.1.0",
+      "description": "Todo service built with Serverless",
+      "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+      },
+      "author": "",
+      "license": "MIT",
+      "dependencies": {
+        "redis": "^2.8.0",
+        "uuid": "^2.0.3"
+      },
+      "devDependencies": {
+        "serverless-kubeless": "^0.4.0"
+      }
+    }
+  function: |
+    'use strict';
+
+    const redis = require('redis');
+
+    const host = process.env.REDIS_HOST;
+    const pass = process.env.REDIS_PASSWORD;
+
+    module.exports = {
+      delete: (event, context) => new Promise((resolve, reject) => {
+        const client = redis.createClient({
+          host,
+          password: pass,
+        });
+        client.on('error', function (err) {
+          reject('Error ' + err);
+        });
+        client.on('ready', () => {
+          client.hget('todos', event.extensions.request.query.id, (err, reply) => {
+            if (err) {
+              reject(err);
+            } else {
+              client.hdel('todos', event.extensions.request.query.id, (err, rep) => {
+                client.quit();
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(reply);
+                }
+              });
+            }
+          });
+        });
+      }),
+    };
+  function-content-type: text
+  handler: todos.delete
+  horizontalPodAutoscaler:
+    metadata:
+      creationTimestamp: null
+    spec:
+      maxReplicas: 0
+      scaleTargetRef:
+        kind: ""
+        name: ""
+    status:
+      conditions: null
+      currentMetrics: null
+      currentReplicas: 0
+      desiredReplicas: 0
+  runtime: nodejs8
+  service:
+    ports:
+    - name: http-function-port
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      created-by: kubeless
+      function: delete
+    type: ClusterIP
+  timeout: "180"
+---
+apiVersion: kubeless.io/v1beta1
+kind: Function
+metadata:
+  labels:
+    created-by: kubeless
+    function: read-all
+  name: read-all
+  namespace: default
+spec:
+  checksum: sha256:e60a3334f63ad2f8f916631642e1ea986033275a082fad6238af8d71428a069d
+  deployment:
+    metadata:
+      creationTimestamp: null
+    spec:
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - env:
+            - name: REDIS_HOST
+              value: gangly-boxer-redis-master
+            - name: REDIS_PASSWORD
+              value: HZ7QDjLDH7
+            name: ""
+            resources: {}
+    status: {}
+  deps: |
+    {
+      "name": "todos",
+      "version": "0.1.0",
+      "description": "Todo service built with Serverless",
+      "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+      },
+      "author": "",
+      "license": "MIT",
+      "dependencies": {
+        "redis": "^2.8.0",
+        "uuid": "^2.0.3"
+      },
+      "devDependencies": {
+        "serverless-kubeless": "^0.4.0"
+      }
+    }
+  function: |
+    'use strict';
+
+    const redis = require('redis');
+
+    const host = process.env.REDIS_HOST;
+    const pass = process.env.REDIS_PASSWORD;
+
+    module.exports = {
+      readAll: (event, context) => new Promise((resolve, reject) => {
+        const client = redis.createClient({
+          host,
+          password: pass,
+        });
+        client.on('error', function (err) {
+          reject('Error ' + err);
+        });
+        client.on('ready', () => {
+          client.hvals('todos', (err, rep) => {
+            client.quit();
+            if (err) {
+              reject(err);
+            }
+            resolve(rep.map(e => JSON.parse(e)));
+          })
+        })
+      }),
+    };
+  function-content-type: text
+  handler: todos.readAll
+  horizontalPodAutoscaler:
+    metadata:
+      creationTimestamp: null
+    spec:
+      maxReplicas: 0
+      scaleTargetRef:
+        kind: ""
+        name: ""
+    status:
+      conditions: null
+      currentMetrics: null
+      currentReplicas: 0
+      desiredReplicas: 0
+  runtime: nodejs8
+  service:
+    ports:
+    - name: http-function-port
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      created-by: kubeless
+      function: read-all
+    type: ClusterIP
+  timeout: "180"
+---
+apiVersion: kubeless.io/v1beta1
+kind: Function
+metadata:
+  labels:
+    created-by: kubeless
+    function: read-one
+  name: read-one
+  namespace: default
+spec:
+  checksum: sha256:d366f5e8a00289df385d6001e689768e1e740a2c858dee43f1b28a0ec6546f62
+  deployment:
+    metadata:
+      creationTimestamp: null
+    spec:
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - env:
+            - name: REDIS_HOST
+              value: gangly-boxer-redis-master
+            - name: REDIS_PASSWORD
+              value: HZ7QDjLDH7
+            name: ""
+            resources: {}
+    status: {}
+  deps: |
+    {
+      "name": "todos",
+      "version": "0.1.0",
+      "description": "Todo service built with Serverless",
+      "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+      },
+      "author": "",
+      "license": "MIT",
+      "dependencies": {
+        "redis": "^2.8.0",
+        "uuid": "^2.0.3"
+      },
+      "devDependencies": {
+        "serverless-kubeless": "^0.4.0"
+      }
+    }
+  function: |
+    'use strict';
+
+    const redis = require('redis');
+
+    const host = process.env.REDIS_HOST;
+    const pass = process.env.REDIS_PASSWORD;
+
+    module.exports = {
+      readOne: (event, context) => new Promise((resolve, reject) => {
+        const client = redis.createClient({
+          host,
+          password: pass,
+        });
+        client.on('error', function (err) {
+          reject('Error ' + err);
+        });
+        client.on('ready', () => {
+          client.hget('todos', event.extensions.request.query.id, (err, rep) => {
+            client.quit();
+            if (err) {
+              reject(err);
+            } else {
+              resolve(rep);
+            }
+          });
+        });
+      }),
+    };
+  function-content-type: text
+  handler: todos.readOne
+  horizontalPodAutoscaler:
+    metadata:
+      creationTimestamp: null
+    spec:
+      maxReplicas: 0
+      scaleTargetRef:
+        kind: ""
+        name: ""
+    status:
+      conditions: null
+      currentMetrics: null
+      currentReplicas: 0
+      desiredReplicas: 0
+  runtime: nodejs8
+  service:
+    ports:
+    - name: http-function-port
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      created-by: kubeless
+      function: read-one
+    type: ClusterIP
+  timeout: "180"
+---
+apiVersion: kubeless.io/v1beta1
+kind: Function
+metadata:
+  labels:
+    created-by: kubeless
+    function: update
+  name: update
+  namespace: default
+spec:
+  checksum: sha256:f135d26a8dd6e2bbbee1bbeedda8fab9e479789e94e940cb4a9c0cce9537fba1
+  deployment:
+    metadata: {}
+    spec:
+      strategy: {}
+      template:
+        metadata: {}
+        spec:
+          containers:
+          - env:
+            - name: REDIS_HOST
+              value: gangly-boxer-redis-master
+            - name: REDIS_PASSWORD
+              value: HZ7QDjLDH7
+            name: ""
+            resources: {}
+    status: {}
+  deps: |
+    {
+      "name": "todos",
+      "version": "0.1.0",
+      "description": "Todo service built with Serverless",
+      "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+      },
+      "author": "",
+      "license": "MIT",
+      "dependencies": {
+        "lodash": "^4.17.4",
+        "redis": "^2.8.0",
+        "uuid": "^2.0.3"
+      },
+      "devDependencies": {
+        "serverless-kubeless": "^0.4.0"
+      }
+    }
+  function: |
+    'use strict';
+
+    const _ = require('lodash');
+    const redis = require('redis');
+    const uuid = require('uuid');
+
+    const host = process.env.REDIS_HOST;
+    const pass = process.env.REDIS_PASSWORD;
+
+    module.exports = {
+      update: (event, context) => new Promise((resolve, reject) => {
+        const data = event.data;
+        const client = redis.createClient({
+          host,
+          password: pass,
+        });
+        client.on('error', function (err) {
+          reject('Error ' + err);
+        });
+        client.on('ready', () => {
+          client.hget('todos', event.extensions.request.query.id, (err, rep) => {
+            if (err) {
+              reject(err);
+            } else {
+              const entry = JSON.parse(rep);
+              const newEntry = _.cloneDeep(entry);
+              _.assign(newEntry, data, { id: uuid.v1(), updatedAt: new Date().getTime() });
+              client.hset('todos', newEntry.id, JSON.stringify(newEntry), (err, reply) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  client.hdel('todos', event.extensions.request.query.id, (err, rep) => {
+                    client.quit();
+                    if (err) {
+                      reject(err);
+                    } else {
+                      resolve(JSON.stringify(newEntry));
+                    }
+                  });
+                }
+              })
+            }
+          });
+        });
+      }),
+    };
+  function-content-type: text
+  handler: todos.update
+  horizontalPodAutoscaler:
+    metadata: {}
+    spec:
+      maxReplicas: 0
+      scaleTargetRef:
+        kind: ""
+        name: ""
+    status:
+      currentReplicas: 0
+      desiredReplicas: 0
+  runtime: nodejs8
+  service:
+    ports:
+    - name: http-function-port
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      created-by: kubeless
+      function: update
+    type: ClusterIP
+  timeout: "180"

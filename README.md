@@ -1,4 +1,4 @@
-# Deploy
+# Create a minikube cluster
 
 ```
 # Start minikube
@@ -9,10 +9,26 @@ kubectl create clusterrolebinding kube-dns-admin --serviceaccount=kube-system:de
 # Install kubeless
 kubectl create ns kubeless
 kubectl create -f  https://github.com/kubeless/kubeless/releases/download/v0.6.0/kubeless-v0.6.0.yaml
+```
 
+# Install the to chart to deploy the kubeless functions and redis
+
+```
+cd chart/todo/
+helm dep update
+helm install --name todo .
+```
+
+# Run front end
+
+Check frontend/react-redux/README.md. Needs to run on localhost.
+
+# The following section is for deploying the kubeless functions manually
+
+```
 # Install redis chart
 helm init
-[in charts/stable/redis] helm install . --values values-production.yaml
+[in charts/stable/redis] helm install . -f values-production.yaml
 
 # Deploy functions
 # manifest at manifests/functions.yaml
@@ -55,14 +71,12 @@ kubeless function deploy \
   --handler todos.update \
   --dependencies backend/package.json \
   --env REDIS_HOST=gangly-boxer-redis-master \
-  --env REDIS_PASSWORD=$(kubectl get secret --namespace default gangly-boxer-redis -o jsonpath="{.data.redis-password" | base64 --decode) \
+  --env REDIS_PASSWORD=$(kubectl get secret --namespace default gangly-boxer-redis -o jsonpath="{.data.redis-password"} | base64 --decode) \
   update
 
 # Deploy Ingress
 kubectl deploy -f manifests/ingress.yaml
 ```
 
-# Run front end
 
-Check frontend/react-redux/README.md. Needs to run on localhost.
 

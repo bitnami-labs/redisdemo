@@ -1,0 +1,44 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "todo.fullname" . -}}
+{{- $servicePort := .Values.service.port -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    app: {{ template "todo.name" . }}
+    chart: {{ template "todo.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- with .Values.ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  rules:
+  {{- range .Values.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+        - path: /create
+          backend:
+            serviceName: {{ $fullName }}-create
+            servicePort: {{ $servicePort }}
+        - path: /read-all
+          backend:
+            serviceName: {{ $fullName }}-read-all
+            servicePort: {{ $servicePort }}
+        - path: /read
+          backend:
+            serviceName: {{ $fullName }}-read
+            servicePort: {{ $servicePort }}
+        - path: /update
+          backend:
+            serviceName: {{ $fullName }}-update
+            servicePort: {{ $servicePort }}
+        - path: /delete
+          backend:
+            serviceName: {{ $fullName }}-delete
+            servicePort: {{ $servicePort }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,21 @@
+redis:
+  cluster:
+    enabled: false
+
+  master:
+    livenessProbe:
+      enabled: true
+    readinessProbe:
+      enabled: true
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+  - 192.168.1.9.nip.io

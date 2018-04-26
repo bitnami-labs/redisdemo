@@ -39,3 +39,12 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- define "todo.redis.fullname" -}}
 {{- printf "%s-%s" .Release.Name "redis" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{/*
+Return the proper Node image name
+*/}}
+{{- define "todo.image" -}}
+{{- $registryName :=  default "docker.io" .Values.image.registry -}}
+{{- $tag := default "latest" .Values.image.tag -}}
+{{- printf "%s/%s:%s" $registryName .Values.image.repository $tag -}}
+{{- end -}}

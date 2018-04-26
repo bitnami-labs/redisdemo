@@ -1,14 +1,14 @@
-service:
-  type: ClusterIP
-  port: 8080
+image:
+  registry: docker.io
+  repository: bitnami/node
+  tag: 9.10.1-prod
+  pullPolicy: IfNotPresent
+
+repository: https://github.com/bitnami-labs/redisdemo.git
+revision: master
 
 ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /
-  hosts:
-  - 192.168.99.100.nip.io
+  host: 192.168.99.100.nip.io
 
 redis:
   cluster:
@@ -17,5 +17,16 @@ redis:
   master:
     livenessProbe:
       enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+
     readinessProbe:
       enabled: true
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 10
+      successThreshold: 1
+      failureThreshold: 5

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "todo.fullname" . }}
+  labels:
+    app: {{ template "todo.name" . }}
+    chart: {{ template "todo.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  index.js: |
+    export const API_URL = 'http://{{ .Values.ingress.host }}/api';

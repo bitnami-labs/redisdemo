@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "todo.fullname" . }}-frontend
+  labels:
+    app: {{ template "todo.name" . }}
+    chart: {{ template "todo.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+  selector:
+    app: {{ template "todo.name" . }}
+    component: "frontend"
+    release: "{{ .Release.Name }}"

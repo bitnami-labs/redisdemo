@@ -1,4 +1,9 @@
 module.exports = {
+  devServer: {
+    host: process.env.APP_HOST || "localhost",
+    port: process.env.APP_PORT || 8080,
+    public: process.env.APP_FQDN || "localhost",
+  },
   entry: {
     javascript: "./app/js/app.jsx",
     html: "./app/index.html"

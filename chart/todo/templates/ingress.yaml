@@ -1,6 +1,4 @@
-{{- if .Values.ingress.enabled -}}
 {{- $fullName := include "todo.fullname" . -}}
-{{- $servicePort := .Values.service.port -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -10,35 +8,35 @@ metadata:
     chart: {{ template "todo.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-{{- with .Values.ingress.annotations }}
   annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ . }}
+    - host: {{ .Values.ingress.host }}
       http:
         paths:
-        - path: /create
+        - path: /
+          backend:
+            serviceName: {{ $fullName }}-frontend
+            servicePort: 8080
+        - path: /api/create
           backend:
             serviceName: {{ $fullName }}-create
-            servicePort: {{ $servicePort }}
-        - path: /read-all
+            servicePort: 8080
+        - path: /api/read-all
           backend:
             serviceName: {{ $fullName }}-read-all
-            servicePort: {{ $servicePort }}
-        - path: /read
+            servicePort: 8080
+        - path: /api/read
           backend:
             serviceName: {{ $fullName }}-read
-            servicePort: {{ $servicePort }}
-        - path: /update
+            servicePort: 8080
+        - path: /api/update
           backend:
             serviceName: {{ $fullName }}-update
-            servicePort: {{ $servicePort }}
-        - path: /delete
+            servicePort: 8080
+        - path: /api/delete
           backend:
             serviceName: {{ $fullName }}-delete
-            servicePort: {{ $servicePort }}
-  {{- end }}
-{{- end }}
+            servicePort: 8080

@@ -1,0 +1,75 @@
+{{- $fullName := include "todo.fullname" . -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-frontend
+  labels:
+    app: {{ template "todo.name" . }}
+    component: "frontend"
+    chart: {{ template "todo.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ template "todo.name" . }}
+        component: "frontend"
+        release: "{{ .Release.Name }}"
+    spec:
+      initContainers:
+      - name: git-clone-repository
+        image: "alpine/git:latest"
+        imagePullPolicy: "IfNotPresent"
+        command: [ '/bin/sh', '-c' , 'git clone {{ .Values.repository }} /app && cd /app && git checkout {{ .Values.revision }}']
+        volumeMounts:
+        - name: app
+          mountPath: /app
+      - name: npm-install
+        image: {{ template "todo.image" . }}
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        workingDir: /app/frontend/react-redux
+        command: ['/bin/bash', '-c', 'useradd bitnami && chown -R bitnami:bitnami /app && npm install']
+        volumeMounts:
+        - name: app
+          mountPath: /app
+      containers:
+      - name: todo
+        image: {{ template "todo.image" . }}
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        workingDir: /app/frontend/react-redux
+        command: ['/bin/bash', '-c', 'useradd bitnami && su bitnami -c "PATH=/opt/bitnami/node/bin:$PATH npm start"']
+        env:
+        - name: APP_HOST
+          value: "0.0.0.0"
+        - name: APP_PORT
+          value: "8080"
+        - name: APP_FQDN
+          value: "{{ .Values.ingress.host }}"
+        ports:
+        - name: http
+          containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 180
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 10
+        resources: {}
+        volumeMounts:
+        - name: app
+          mountPath: /app
+        - name: config
+          mountPath: /app/frontend/react-redux/app/js/actions/index.js
+          subPath: index.js
+      volumes:
+      - name: app
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: {{ template "todo.fullname" . }}

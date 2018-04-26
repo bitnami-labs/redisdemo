@@ -23,6 +23,7 @@ redis:
       successThreshold: 1
       failureThreshold: 5
 
+    # Redis slave Readiness Probe
     readinessProbe:
       enabled: true
       initialDelaySeconds: 5

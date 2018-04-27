@@ -13,21 +13,4 @@ ingress:
 redis:
   cluster:
     enabled: true
-
-  master:
-    livenessProbe:
-      enabled: true
-      initialDelaySeconds: 30
-      periodSeconds: 10
-      timeoutSeconds: 5
-      successThreshold: 1
-      failureThreshold: 5
-
-    # Redis slave Readiness Probe
-    readinessProbe:
-      enabled: true
-      initialDelaySeconds: 5
-      periodSeconds: 10
-      timeoutSeconds: 10
-      successThreshold: 1
-      failureThreshold: 5
+    slaveCount: 3

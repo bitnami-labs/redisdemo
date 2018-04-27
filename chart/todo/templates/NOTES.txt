@@ -1,0 +1,4 @@
+
+Access your Todo application by visiting: http://{{ .Values.ingress.host }}
+
+** Please note: It may take a few minute for the deployment to become ready **

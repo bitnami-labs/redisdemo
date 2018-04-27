@@ -1,5 +1,5 @@
 name: todo
-version: 0.1.2
+version: 0.1.4
 appVersion: 0.1.0
 description: Todo is a simple todo application that uses ReactJS for the frontend and kubeless functions for the backend api.
 icon: https://www.shareicon.net/download/2016/11/16/854159_pencil_512x512.png

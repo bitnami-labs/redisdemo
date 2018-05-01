@@ -17,7 +17,7 @@ spec:
           - name: create
             env:
             - name: REDIS_HOST
-              value: {{ template "todo.redis.fullname" . }}-master
+              value: {{ template "todo.redis.host.readwrite" . }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -61,7 +61,7 @@ spec:
           - name: update
             env:
             - name: REDIS_HOST
-              value: {{ template "todo.redis.fullname" . }}-master
+              value: {{ template "todo.redis.host.readwrite" . }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -105,7 +105,7 @@ spec:
           - name: delete
             env:
             - name: REDIS_HOST
-              value: {{ template "todo.redis.fullname" . }}-master
+              value: {{ template "todo.redis.host.readwrite" . }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -149,7 +149,7 @@ spec:
           - name: read-one
             env:
             - name: REDIS_HOST
-              value: {{ template "todo.redis.fullname" . }}-slave
+              value: {{ template "todo.redis.host.readonly" . }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -193,7 +193,7 @@ spec:
           - name: read-all
             env:
             - name: REDIS_HOST
-              value: {{ template "todo.redis.fullname" . }}-slave
+              value: {{ template "todo.redis.host.readonly" . }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:

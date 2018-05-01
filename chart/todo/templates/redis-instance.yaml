@@ -1,0 +1,23 @@
+{{- $fullName := include "todo.fullname" . -}}
+{{- if not .Values.redis.enabled }}
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: {{ $fullName }}-redis-instance
+  labels:
+    app: {{ template "todo.name" . }}
+    chart: {{ template "todo.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  clusterServiceClassExternalName: azure-rediscache
+  clusterServicePlanExternalName: {{ .Values.azure.servicePlan }}
+  parameters:
+    location: {{ .Values.azure.location }}
+    resourceGroup: {{ .Release.Namespace }}
+    sslEnforcement: disabled
+    firewallRules:
+    - startIPAddress: "0.0.0.0"
+      endIPAddress: "255.255.255.255"
+      name: "AllowAll"
+{{- end }}

@@ -1,4 +1,5 @@
 {{- $fullName := include "todo.fullname" . -}}
+{{- $redisFullName := include "todo.redis.fullname" . -}}
 apiVersion: kubeless.io/v1beta1
 kind: Function
 metadata:
@@ -17,12 +18,24 @@ spec:
           - name: create
             env:
             - name: REDIS_HOST
+            {{- if .Values.redis.enabled }}
               value: {{ template "todo.redis.host.readwrite" . }}
+            {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $redisFullName }}-secret
+                  key: host
+            {{- end }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "todo.redis.fullname" . }}
+                {{- if .Values.redis.enabled }}
+                  name: {{ $redisFullName }}
                   key: redis-password
+                {{- else }}
+                  name: {{ $redisFullName }}-secret
+                  key: password
+                {{- end }}
             resources: {}
   deps: |
 {{ .Files.Get "backend/package.json" | indent 4 }}
@@ -61,12 +74,24 @@ spec:
           - name: update
             env:
             - name: REDIS_HOST
+            {{- if .Values.redis.enabled }}
               value: {{ template "todo.redis.host.readwrite" . }}
+            {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $redisFullName }}-secret
+                  key: host
+            {{- end }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "todo.redis.fullname" . }}
+                {{- if .Values.redis.enabled }}
+                  name: {{ $redisFullName }}
                   key: redis-password
+                {{- else }}
+                  name: {{ $redisFullName }}-secret
+                  key: password
+                {{- end }}
             resources: {}
   deps: |
 {{ .Files.Get "backend/package.json" | indent 4 }}
@@ -105,12 +130,24 @@ spec:
           - name: delete
             env:
             - name: REDIS_HOST
+            {{- if .Values.redis.enabled }}
               value: {{ template "todo.redis.host.readwrite" . }}
+            {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $redisFullName }}-secret
+                  key: host
+            {{- end }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "todo.redis.fullname" . }}
+                {{- if .Values.redis.enabled }}
+                  name: {{ $redisFullName }}
                   key: redis-password
+                {{- else }}
+                  name: {{ $redisFullName }}-secret
+                  key: password
+                {{- end }}
             resources: {}
   deps: |
 {{ .Files.Get "backend/package.json" | indent 4 }}
@@ -149,12 +186,24 @@ spec:
           - name: read-one
             env:
             - name: REDIS_HOST
+            {{- if .Values.redis.enabled }}
               value: {{ template "todo.redis.host.readonly" . }}
+            {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $redisFullName }}-secret
+                  key: host
+            {{- end }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "todo.redis.fullname" . }}
+                {{- if .Values.redis.enabled }}
+                  name: {{ $redisFullName }}
                   key: redis-password
+                {{- else }}
+                  name: {{ $redisFullName }}-secret
+                  key: password
+                {{- end }}
             resources: {}
   deps: |
 {{ .Files.Get "backend/package.json" | indent 4 }}
@@ -193,12 +242,24 @@ spec:
           - name: read-all
             env:
             - name: REDIS_HOST
+            {{- if .Values.redis.enabled }}
               value: {{ template "todo.redis.host.readonly" . }}
+            {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $redisFullName }}-secret
+                  key: host
+            {{- end }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "todo.redis.fullname" . }}
+                {{- if .Values.redis.enabled }}
+                  name: {{ $redisFullName }}
                   key: redis-password
+                {{- else }}
+                  name: {{ $redisFullName }}-secret
+                  key: password
+                {{- end }}
             resources: {}
   deps: |
 {{ .Files.Get "backend/package.json" | indent 4 }}

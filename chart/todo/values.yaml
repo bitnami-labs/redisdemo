@@ -1,8 +1,8 @@
 image:
   registry: docker.io
   repository: bitnami/node
-  tag: 9.10.1-prod
-  pullPolicy: IfNotPresent
+  tag: 8-prod
+  pullPolicy: Always
 
 repository: https://github.com/bitnami-labs/redisdemo.git
 revision: master

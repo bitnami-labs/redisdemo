@@ -50,8 +50,8 @@ The following tables lists the configurable parameters of the Todo chart and the
 |--------------------|-----------------------------------------|-------------------------------------------------|
 | `image.registry`   | Node image registry                     | `docker.io`                                     |
 | `image.repository` | Node image repository                   | `bitnami/node`                                  |
-| `image.tag`        | Node image tag                          | `9.10.1-prod`                                   |
-| `image.pullPolicy` | Node image pull policy                  | `IfNotPresent`                                  |
+| `image.tag`        | Node image tag                          | `8-prod`                                        |
+| `image.pullPolicy` | Node image pull policy                  | `Always`                                        |
 | `repository`       | Git repository of Todo application      | `https://github.com/bitnami-labs/redisdemo.git` |
 | `revision`         | Git branch/revision of Todo application | `master`                                        |
 | `ingress.host`     | Hostname for the Todo application       | `192.168.99.100.nip.io`                         |

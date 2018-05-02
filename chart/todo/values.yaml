@@ -11,6 +11,15 @@ ingress:
   host: 192.168.99.100.nip.io
 
 redis:
+  # Whether to enable in-cluster redis, use Azure Redis Cache if disabled
+  enabled: true
   cluster:
     enabled: true
-    slaveCount: 3
+    slaveCount: 1
+
+## All of these values are only used when redis.enabled is set to false
+azure:
+  # The Azure region in which to deploy Azure Redis Cache
+  location: eastus
+  # The plan to request for Azure Redis Cache
+  servicePlan: standard

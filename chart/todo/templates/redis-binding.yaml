@@ -1,0 +1,16 @@
+{{- $fullName := include "todo.fullname" . -}}
+{{- if not .Values.redis.enabled }}
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceBinding
+metadata:
+  name: {{ $fullName }}-redis-binding
+  labels:
+    app: {{ template "todo.name" . }}
+    chart: {{ template "todo.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  instanceRef:
+    name: {{ $fullName }}-redis-instance
+  secretName: {{ $fullName }}-redis-secret
+{{- end }}

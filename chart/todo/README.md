@@ -14,7 +14,7 @@ This charts deploys a [Todo](https://github.com/bitnami-labs/redisdemo) applicat
 
 The Todo application frontend is implement in ReactJS and uses the [bitnami/node](https://github.com/bitnami/bitnami-docker-node) image for docker. The backend api functionality of the Todo application is implemented in NodeJS and the runtime is provided by the [Kubeless](https://kubeless.io/) serverless framework.
 
-The application requires Redis for the data storage and the chart deploys the [official Redis chart](https://hub.kubeapps.com/charts/stable/redis) to satisfy this requirement.
+The application requires Redis for the data storage and the chart can be configured to deploy the [official Redis chart](https://hub.kubeapps.com/charts/stable/redis)(default) or use Azure Redis Cache using the Kubernetes Service Broker API.
 
 ## Prerequisites
 
@@ -46,12 +46,15 @@ The command removes all the Kubernetes components associated with the chart and 
 
 The following tables lists the configurable parameters of the Todo chart and their default values.
 
-|     Parameter      |               Description               |                     Default                     |
-|--------------------|-----------------------------------------|-------------------------------------------------|
-| `image.registry`   | Node image registry                     | `docker.io`                                     |
-| `image.repository` | Node image repository                   | `bitnami/node`                                  |
-| `image.tag`        | Node image tag                          | `8-prod`                                        |
-| `image.pullPolicy` | Node image pull policy                  | `Always`                                        |
-| `repository`       | Git repository of Todo application      | `https://github.com/bitnami-labs/redisdemo.git` |
-| `revision`         | Git branch/revision of Todo application | `master`                                        |
-| `ingress.host`     | Hostname for the Todo application       | `192.168.99.100.nip.io`                         |
+|      Parameter      |                              Description                              |                     Default                     |
+|---------------------|-----------------------------------------------------------------------|-------------------------------------------------|
+| `image.registry`    | Node image registry                                                   | `docker.io`                                     |
+| `image.repository`  | Node image repository                                                 | `bitnami/node`                                  |
+| `image.tag`         | Node image tag                                                        | `8-prod`                                        |
+| `image.pullPolicy`  | Node image pull policy                                                | `Always`                                        |
+| `repository`        | Git repository of Todo application                                    | `https://github.com/bitnami-labs/redisdemo.git` |
+| `revision`          | Git branch/revision of Todo application                               | `master`                                        |
+| `ingress.host`      | Hostname for the Todo application                                     | `192.168.99.100.nip.io`                         |
+| `redis.enabled`     | Whether to enable in-cluster redis, use Azure Redis Cache if disabled | `true`                                          |
+| `azure.location`    | The Azure region in which to deploy Azure Redis Cache                 | `eastus`                                        |
+| `azure.servicePlan` | The plan to request for Azure Redis Cache                             | `standard`                                      |

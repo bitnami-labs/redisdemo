@@ -15,9 +15,4 @@ spec:
   parameters:
     location: {{ .Values.azure.location }}
     resourceGroup: {{ .Release.Namespace }}
-    sslEnforcement: disabled
-    firewallRules:
-    - startIPAddress: "0.0.0.0"
-      endIPAddress: "255.255.255.255"
-      name: "AllowAll"
 {{- end }}

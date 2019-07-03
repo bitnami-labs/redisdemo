@@ -20,9 +20,9 @@ spec:
     spec:
       initContainers:
       - name: git-clone-repository
-        image: "alpine/git:latest"
+        image: "bitnami/git:latest"
         imagePullPolicy: "IfNotPresent"
-        command: [ '/bin/sh', '-c' , 'git clone {{ .Values.repository }} /app && cd /app && git checkout {{ .Values.revision }}']
+        entrypoint: [ '/bin/sh', '-c' , 'git clone {{ .Values.repository }} /app && cd /app && git checkout {{ .Values.revision }}']
         volumeMounts:
         - name: app
           mountPath: /app
